@@ -8,16 +8,14 @@ import com.kakao.auth.KakaoSDK;
 public class GlobalApplication extends Application {
     private static volatile GlobalApplication obj = null;
     private static volatile Activity currentActivity = null;
-    private static GlobalApplication mInstance;
-    private AudioServiceInterface mInterface;
+
 
     @Override
     public void onCreate() {
         super.onCreate();
         obj = this;
         KakaoSDK.init(new KakaoSDKAdapter());
-        mInstance = this;
-        mInterface = new AudioServiceInterface(getApplicationContext());
+
     }
 
     public static GlobalApplication getGlobalApplicationContext() {
@@ -34,16 +32,6 @@ public class GlobalApplication extends Application {
     }
 
 
-
-
-
-    public static GlobalApplication getInstance() {
-        return mInstance;
-    }
-
-    public AudioServiceInterface getServiceInterface() {
-        return mInterface;
-    }
 
 
 

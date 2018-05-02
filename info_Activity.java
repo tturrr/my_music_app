@@ -88,7 +88,7 @@ public class info_Activity extends AppCompatActivity {
             public void onClick(final View v) {
                 AlertDialog.Builder dialog = new AlertDialog.Builder(info_Activity.this);
                 dialog.setTitle("알림")
-                        .setMessage("메세지알림")
+                        .setMessage("사진을 가져올 곳을 선택해 주세요.")
                         .setPositiveButton("카메라", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
