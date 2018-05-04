@@ -2,17 +2,17 @@ package com.example.user.music;
 
 import java.io.Serializable;
 
-public class music_item_list implements Serializable {
+public class faver_music_item implements Serializable {
     private String id;
     private String albumId;
     private String title;
     private String artist;
 
-    public music_item_list(){
+    public faver_music_item(){
 
     }
 
-    public music_item_list(String id, String albumId, String title, String artist) {
+    public faver_music_item(String id, String albumId, String title, String artist) {
         this.id = id;
         this.albumId = albumId;
         this.title = title;

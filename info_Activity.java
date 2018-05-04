@@ -148,6 +148,10 @@ public class info_Activity extends AppCompatActivity {
 
             }else if(face_email != null){
                 onClick_face_Logout();
+            }else{
+                Intent intent = new Intent(info_Activity.this,login_Activity.class);
+                startActivity(intent);
+                finish();
             }
 
             }
