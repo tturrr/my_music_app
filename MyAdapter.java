@@ -3,9 +3,6 @@ package com.example.user.music;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -15,13 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MyAdapter extends BaseAdapter {
@@ -34,8 +30,7 @@ public class MyAdapter extends BaseAdapter {
 
 
 
-    public MyAdapter() {
-    }
+
 
     public MyAdapter(Activity activity, List<music_item_list> list) {
         this.list = list;

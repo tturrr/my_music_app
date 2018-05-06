@@ -19,6 +19,7 @@ public class faver_music_Activity extends AppCompatActivity {
     private ListView listView;
     public static ArrayList<faver_music_item> list;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,14 +42,17 @@ public class faver_music_Activity extends AppCompatActivity {
     public  void getMusicList(){
         list = new ArrayList<>();
         //가져오고 싶은 컬럼 명을 나열합니다. 음악의 아이디, 앰블럼 아이디, 제목, 아스티스트 정보를 가져옵니다.
-        String[] projection = {MediaStore.Audio.Media._ID,
+        String[] faver_list = {MediaStore.Audio.Media._ID,
                 MediaStore.Audio.Media.ALBUM_ID,
                 MediaStore.Audio.Media.TITLE,
                 MediaStore.Audio.Media.ARTIST
         };
 
+
+
+
         Cursor cursor = getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                projection, null, null, null);
+                faver_list, null, null, null);
 
         while(cursor.moveToNext()){
             faver_music_item musicDto = new faver_music_item();

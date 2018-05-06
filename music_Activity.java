@@ -1,78 +1,42 @@
 package com.example.user.music;
 
-import android.content.pm.PackageManager;
-
 import android.Manifest;
-import android.content.ComponentName;
-import android.content.ContentResolver;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.media.MediaPlayer;
-import android.net.Uri;
-import android.os.Environment;
-import android.os.IBinder;
-import android.provider.BaseColumns;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContentResolverCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.content.ContentUris;
 
-import com.squareup.picasso.Picasso;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
-
-import android.content.Intent;
-import android.database.Cursor;
-import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import java.util.ArrayList;
 
 
 
 public class music_Activity extends AppCompatActivity {
 
+    private static final int REQ_CODE_SELECT_IMAGE = 10;
     int e ;
     int i = 0;
 
+    dbHelper helper;
+    SQLiteDatabase db;
     ImageButton back_imgbtn;
     Button add_btn;
 
     private ListView listView;
     public static ArrayList<music_item_list> list;
-    dbHelper helper;
-    SQLiteDatabase db;
-    String sql;
-
-
 
 
     @Override
@@ -80,11 +44,8 @@ public class music_Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_);
         add_btn = (Button)findViewById(R.id.add_btn);
-        helper = new dbHelper(this);
-        db = helper.getWritableDatabase();
 
-        Cursor cursor = db.rawQuery("select * from faber",null);
-        startManagingCursor(cursor);
+
 
         helper = new dbHelper(this);
         try {
@@ -94,7 +55,6 @@ public class music_Activity extends AppCompatActivity {
         } catch (SQLiteException e) {
             db = helper.getReadableDatabase();
         }
-
 
 
 
@@ -126,33 +86,10 @@ public class music_Activity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                list = new ArrayList<>();
-                //가져오고 싶은 컬럼 명을 나열합니다. 음악의 아이디, 앰블럼 아이디, 제목, 아스티스트 정보를 가져옵니다.
-                String[] projection = {MediaStore.Audio.Media._ID,
-                        MediaStore.Audio.Media.ALBUM_ID,
-                        MediaStore.Audio.Media.TITLE,
-                        MediaStore.Audio.Media.ARTIST
-                };
-
-                Cursor cursor = getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                        projection, null, null, null);
-
-                while(cursor.moveToNext()){
-                    music_item_list musicDto = new music_item_list();
-                    musicDto.setId(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
-                    musicDto.setAlbumId(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)));
-                    musicDto.setTitle(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
-                    musicDto.setArtist(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
-                    list.add(musicDto);
-                }
-                cursor.close();
-
-                for(i=0; i<list.size(); i++) {
-                    sql = String.format("INSERT INTO faber VALUES(null, '" + list.get(i) + "','" + list.get(i) + "','" + list.get(i) + "','" + list.get(i) + "');");
-                    db.execSQL(sql);
-                }
-                Intent intent = new Intent(music_Activity.this,faver_music_Activity.class);
-                startActivity(intent);
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setType(android.provider.MediaStore.Audio.Media.CONTENT_TYPE);
+                intent.setData(android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, REQ_CODE_SELECT_IMAGE);
             }
         });
 
@@ -174,7 +111,12 @@ public class music_Activity extends AppCompatActivity {
 
 
 
-
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQ_CODE_SELECT_IMAGE) {
+            if (resultCode == Activity.RESULT_OK) {
+            }
+        }
+    }
 
 
 

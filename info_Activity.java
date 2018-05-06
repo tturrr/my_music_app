@@ -8,10 +8,9 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
-import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
@@ -19,7 +18,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -29,17 +27,12 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.facebook.login.LoginManager;
+import com.google.firebase.auth.FirebaseAuth;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.LogoutResponseCallback;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,11 +44,15 @@ public class info_Activity extends AppCompatActivity {
     ImageView profile_image;
     TextView profile_name;
     private String mCurrentPhotoPath;
+    private  FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info_);
+        auth = FirebaseAuth.getInstance();
+
+        final String google_id = getIntent().getStringExtra("google_id");
 
         final String face_name = getIntent().getStringExtra("face_name");
         final String face_birth = getIntent().getStringExtra("face_birth");
@@ -80,6 +77,9 @@ public class info_Activity extends AppCompatActivity {
         }else if(face_email != null){
             Glide.with(this).load(face_img).into(profile_image); //글라이드라이브러리를 사용하여 url 이미지를 바로 이미지뷰에 로드시킨다.
             profile_name.setText(face_name);
+        }else if(google_id != null){
+            Glide.with(this).load(auth.getCurrentUser().getPhotoUrl()).into(profile_image);
+            profile_name.setText(auth.getCurrentUser().getDisplayName());
         }
 
 
@@ -149,6 +149,7 @@ public class info_Activity extends AppCompatActivity {
             }else if(face_email != null){
                 onClick_face_Logout();
             }else{
+                auth.signOut();
                 Intent intent = new Intent(info_Activity.this,login_Activity.class);
                 startActivity(intent);
                 finish();
