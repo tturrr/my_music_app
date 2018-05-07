@@ -13,11 +13,13 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout chat_btn;
     LinearLayout music_btn;
     LinearLayout friends_btn;
+    LinearLayout board_btn;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        board_btn = (LinearLayout)findViewById(R.id.board_btn);
         chat_btn = (LinearLayout)findViewById(R.id.chat_btn);
         info_view = (ImageView)findViewById(R.id.info_img);
         music_btn = (LinearLayout)findViewById(R.id.music_btn);
@@ -33,6 +35,15 @@ public class MainActivity extends AppCompatActivity {
          final String kakao_image = getIntent().getStringExtra("kakao_image");
          final String kakao_name = getIntent().getStringExtra("kakao_name");
          final long kakao_number = getIntent().getLongExtra("kakao_number",0);
+
+         //메모장으로 이동한다
+        board_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this,board_Activity.class);
+                startActivity(intent);
+            }
+        });
 
 
          //친구목록으로 이동한다
