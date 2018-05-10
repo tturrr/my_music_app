@@ -31,98 +31,63 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class writeBoard_Activity extends AppCompatActivity {
+public class boardModify_Activity extends AppCompatActivity {
 
-    private String mCurrentPhotoPath;
-
-    ImageView write_btn;
-    ImageButton back_btn;
-    ImageView writeImg_view;
+    ImageButton back_imgbutton;
+    ImageView img_btn;
+    ImageView delete_btn;
+    ImageView modify_btn;
     EditText title_txt;
     EditText content_txt;
-    ImageView write_cmr_btn;
+    ImageView writeImg_view;
+
     SharedPreferences akey_save;
-    int a=0;
+    SharedPreferences img ;
+    SharedPreferences title_txt1 ;
+    SharedPreferences content1;
+
+    private String mCurrentPhotoPath;
     private String asd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_write_board_);
+        setContentView(R.layout.activity_board_modify_);
 
-        write_cmr_btn = (ImageView)findViewById(R.id.write_cmr_btn);
-        writeImg_view = (ImageView)findViewById(R.id.writeImg_view);
-        write_btn = (ImageView)findViewById(R.id.write_btn);
-        back_btn = (ImageButton)findViewById(R.id.back_imgbutton);
-        content_txt = (EditText)findViewById(R.id.content_txt);
+
+        back_imgbutton = (ImageButton)findViewById(R.id.back_imgbutton);
+        img_btn = (ImageView)findViewById(R.id.img_btn);
+        delete_btn = (ImageView)findViewById(R.id.delete_btn);
+        modify_btn = (ImageView)findViewById(R.id.modify_btn);
         title_txt = (EditText)findViewById(R.id.title_txt);
-        final SharedPreferences bod_num = getSharedPreferences("bod_num",0);
-        final SharedPreferences.Editor edit_bod_num = bod_num.edit();
-        akey_save = getSharedPreferences("akey",0);
-        a = akey_save.getInt("akey1",0);
+        content_txt = (EditText)findViewById(R.id.content_txt);
+        writeImg_view = (ImageView)findViewById(R.id.writeImg_view);
+
+        title_txt1 = getSharedPreferences("title_txt", 0);
+        content1 = getSharedPreferences("content_txt",0);
+        img = getSharedPreferences("img",0);
+
+        final int chk_position = getIntent().getIntExtra("position",0);
+        int chk = chk_position;
+        //이미지와 텍스트들을 포지션값을 가져와 거기에맞는 아이템들을 가지고 셋트한다.
+        title_txt.setText(title_txt1.getString(String.valueOf(chk),"no_title"));
+        content_txt.setText(content1.getString(String.valueOf(chk),"no_content"));
+        String image = img.getString(String.valueOf(chk),"sad");
+        Uri get_uri = Uri.parse(image);
+        writeImg_view.setImageURI(get_uri);
 
 
-
-
-
-
-
-
-        //글쓰기 버튼 클릭시 보드액티비티의 온액티비티 리절트로 돌아간다.
-        write_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(writeBoard_Activity.this,board_Activity.class);
-
-                SharedPreferences img = getSharedPreferences("img",0);
-                SharedPreferences.Editor edit_img = img.edit();
-                String urs = mCurrentPhotoPath;
-                String gal = asd;
-
-
-
-
-                SharedPreferences akey_save = getSharedPreferences("akey",0);
-                SharedPreferences.Editor akey_editor = akey_save.edit();
-                a++;
-
-                SharedPreferences title_txt1 = getSharedPreferences("title_txt",0);
-                SharedPreferences.Editor title_txt_editor = title_txt1.edit();
-
-                SharedPreferences content1 = getSharedPreferences("content_txt",0);
-                SharedPreferences.Editor content_txt_editor = content1.edit();
-
-                content_txt_editor.putString(String.valueOf(a),content_txt.getText().toString()).commit();
-                title_txt_editor.putString(String.valueOf(a),title_txt.getText().toString()).commit();
-                akey_editor.putInt("akey1",a).commit();
-                if(mCurrentPhotoPath == null){
-                    edit_img.putString(String.valueOf(a),gal).commit();
-                }else {
-                    edit_img.putString(String.valueOf(a), urs).commit();
-                }
-                edit_bod_num.putString(String.valueOf(a),String.valueOf(a)).commit();
-
-                setResult(105,intent);
-                finish();
-            }
-        });
-
-
-
-
-
-
-        //카메라 or 갤러리버튼 사진또는 갤러리에서 이미지를 이미지뷰로 가져온다.
-        write_cmr_btn.setOnClickListener(new View.OnClickListener() {
+        //카메라&&갤러리 버튼 클릭시 이미지를 가져와 뷰에 적용한다.
+        img_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(writeBoard_Activity.this);
+                AlertDialog.Builder dialog = new AlertDialog.Builder(boardModify_Activity.this);
                 dialog.setTitle("알림")
                         .setMessage("사진을 가져올 곳을 선택해 주세요.")
                         .setPositiveButton("카메라", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(writeBoard_Activity.this,"카메라 버튼을 누르셨습니다.",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(boardModify_Activity.this,"카메라 버튼을 누르셨습니다.",Toast.LENGTH_SHORT).show();
                                 requirePermission();
                                 boolean camera =  ContextCompat.checkSelfPermission
                                         (v.getContext(),Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
@@ -136,7 +101,7 @@ public class writeBoard_Activity extends AppCompatActivity {
                                     takePicture();
 
                                 }else {
-                                    Toast.makeText(writeBoard_Activity.this,"권한이 없습니다 권한을 받아주세요",Toast.LENGTH_LONG).show();
+                                    Toast.makeText(boardModify_Activity.this,"권한이 없습니다 권한을 받아주세요",Toast.LENGTH_LONG).show();
 
                                 }
 
@@ -146,28 +111,75 @@ public class writeBoard_Activity extends AppCompatActivity {
                         .setNegativeButton("갤러리", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(writeBoard_Activity.this,"갤러리 버튼을 누르셨습니다",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(boardModify_Activity.this,"갤러리 버튼을 누르셨습니다",Toast.LENGTH_SHORT).show();
                                 selectGallery();
                             }
                         }).create().show();
             }
         });
 
-
-
-
-
-        //뒤로가기 버튼 뒤로 이동한다.
-        back_btn.setOnClickListener(new View.OnClickListener() {
+        //수정버튼 클릭시 포지션위치에 맞는 리스트뷰의 내용을 수정한다.
+        modify_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(writeBoard_Activity.this,board_Activity.class);
+                title_txt1 = getSharedPreferences("title_txt", 0);
+                content1 = getSharedPreferences("content_txt",0);
+                img = getSharedPreferences("img",0);
+
+                SharedPreferences.Editor edit_title = title_txt1.edit();
+                SharedPreferences.Editor edit_contents = content1.edit();
+                SharedPreferences.Editor edit_img = img.edit();
+                String urs = mCurrentPhotoPath;
+                String gal = asd;
+
+
+                edit_title.putString(String.valueOf(chk_position),title_txt.getText().toString()).commit();
+                edit_contents.putString(String.valueOf(chk_position),content_txt.getText().toString()).commit();
+
+                if(mCurrentPhotoPath==null){
+                    edit_img.putString(String.valueOf(chk_position),gal).commit();
+                }else{
+                    edit_img.putString(String.valueOf(chk_position),urs).commit();
+                }
+
+                Intent intent = new Intent(boardModify_Activity.this,board_Activity.class);
+
+                setResult(300,intent);
+                finish();
+            }
+        });
+
+
+        //삭제버튼 클릭시 포지션 위치에 맞는 리스트뷰의 아이템을 지운다.
+        delete_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                title_txt1 = getSharedPreferences("title_txt", 0);
+
+
+                SharedPreferences.Editor edit_title = title_txt1.edit();
+
+                edit_title.remove(String.valueOf(chk_position)).commit();
+
+
+                Intent intent = new Intent(boardModify_Activity.this, board_Activity.class);
+                setResult(200, intent);
+                finish();
+            }
+        });
+
+
+
+        //뒤로가기 버튼 클릭시 뒤로간다.
+        back_imgbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(boardModify_Activity.this,board_Activity.class);
                 startActivity(intent);
             }
         });
+
     }
-
-
 
 
     void requirePermission() {
@@ -298,13 +310,9 @@ public class writeBoard_Activity extends AppCompatActivity {
         }else if(requestCode == 20){
             sendPicture(data.getData());
             asd = String.valueOf(data.getData());
-
         }
 
     }
-
-
-
 
 
 }

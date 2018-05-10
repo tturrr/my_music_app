@@ -5,10 +5,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.example.user.music.model.board_List_Item;
 
 import java.util.ArrayList;
 
@@ -18,6 +17,7 @@ public class board_Adapter extends BaseAdapter{
 
     ArrayList<board_List_Item> list_itemArrayList;
     ViewHolder viewholder;
+
 
     public board_Adapter(Context context, ArrayList<board_List_Item> list_itemArrayList) {
         this.context = context;
@@ -49,6 +49,7 @@ public class board_Adapter extends BaseAdapter{
             viewholder.title_textView = (TextView)convertView.findViewById(R.id.title_txt);
             viewholder.board_img = (ImageView)convertView.findViewById(R.id.picture_img);
 
+
             convertView.setTag(viewholder);
 
         }else{
@@ -56,6 +57,7 @@ public class board_Adapter extends BaseAdapter{
         }
         viewholder.title_textView.setText(list_itemArrayList.get(position).getTitle());
         viewholder.board_img.setImageURI(list_itemArrayList.get(position).getBod_img());
+
 
 
 
@@ -70,7 +72,7 @@ public class board_Adapter extends BaseAdapter{
 
         TextView title_textView;
         ImageView board_img;
-
+        CheckBox checkBox;
 
     }
 
