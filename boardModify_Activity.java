@@ -26,6 +26,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -122,49 +124,83 @@ public class boardModify_Activity extends AppCompatActivity {
         modify_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                title_txt1 = getSharedPreferences("title_txt", 0);
-                content1 = getSharedPreferences("content_txt",0);
-                img = getSharedPreferences("img",0);
+                AlertDialog.Builder dialog = new AlertDialog.Builder(boardModify_Activity.this);
+                dialog.setTitle("알림")
+                        .setMessage("글을 수정 하시겠습니까?")
+                        .setPositiveButton("예", new DialogInterface.OnClickListener() {
 
-                SharedPreferences.Editor edit_title = title_txt1.edit();
-                SharedPreferences.Editor edit_contents = content1.edit();
-                SharedPreferences.Editor edit_img = img.edit();
-                String urs = mCurrentPhotoPath;
-                String gal = asd;
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                title_txt1 = getSharedPreferences("title_txt", 0);
+                                content1 = getSharedPreferences("content_txt",0);
+                                img = getSharedPreferences("img",0);
+
+                                SharedPreferences.Editor edit_title = title_txt1.edit();
+                                SharedPreferences.Editor edit_contents = content1.edit();
+                                SharedPreferences.Editor edit_img = img.edit();
+                                String urs = mCurrentPhotoPath;
+                                String gal = asd;
 
 
-                edit_title.putString(String.valueOf(chk_position),title_txt.getText().toString()).commit();
-                edit_contents.putString(String.valueOf(chk_position),content_txt.getText().toString()).commit();
+                                edit_title.putString(String.valueOf(chk_position),title_txt.getText().toString()).commit();
+                                edit_contents.putString(String.valueOf(chk_position),content_txt.getText().toString()).commit();
 
-                if(mCurrentPhotoPath==null){
-                    edit_img.putString(String.valueOf(chk_position),gal).commit();
-                }else{
-                    edit_img.putString(String.valueOf(chk_position),urs).commit();
-                }
+                                if(mCurrentPhotoPath==null){
+                                    edit_img.putString(String.valueOf(chk_position),gal).commit();
+                                }else{
+                                    edit_img.putString(String.valueOf(chk_position),urs).commit();
+                                }
 
-                Intent intent = new Intent(boardModify_Activity.this,board_Activity.class);
+                                Intent intent = new Intent(boardModify_Activity.this,board_Activity.class);
 
-                setResult(300,intent);
-                finish();
-            }
+                                setResult(300,intent);
+                                finish();
+                            }
+                        })
+                .setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                }).create().show();
+        }
         });
 
 
         //삭제버튼 클릭시 포지션 위치에 맞는 리스트뷰의 아이템을 지운다.
+
         delete_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                title_txt1 = getSharedPreferences("title_txt", 0);
+                AlertDialog.Builder dialog = new AlertDialog.Builder(boardModify_Activity.this);
+                dialog.setTitle("알림")
+                        .setMessage("글을 삭제 하시겠습니까?")
+                        .setPositiveButton("예", new DialogInterface.OnClickListener() {
 
 
-                SharedPreferences.Editor edit_title = title_txt1.edit();
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                title_txt1 = getSharedPreferences("title_txt", 0);
 
-                edit_title.remove(String.valueOf(chk_position)).commit();
+
+                                SharedPreferences.Editor edit_title = title_txt1.edit();
+
+                                edit_title.remove(String.valueOf(chk_position)).commit();
 
 
-                Intent intent = new Intent(boardModify_Activity.this, board_Activity.class);
-                setResult(200, intent);
-                finish();
+                                Intent intent = new Intent(boardModify_Activity.this, board_Activity.class);
+                                setResult(200, intent);
+                                finish();
+                            }
+                        })
+                        .setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        }).create().show();
             }
         });
 
@@ -305,14 +341,62 @@ public class boardModify_Activity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 10) {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 4;
+            Bitmap imageBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, options);
+
+            try {
+                // 기본 카메라 모듈을 이용해 촬영할 경우 가끔씩 이미지가
+                // 회전되어 출력되는 경우가 존재하여
+                // 이미지를 상황에 맞게 회전시킨다
+                ExifInterface exif = new ExifInterface(mCurrentPhotoPath);
+                int exifOrientation = exif.getAttributeInt(
+                        ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                int exifDegree = exifOrientationToDegrees(exifOrientation);
+
+                //회전된 이미지를 다시 회전시켜 정상 출력
+                imageBitmap = rotate(imageBitmap, exifDegree);
+
+                //회전시킨 이미지를 저장
+                saveExifFile(imageBitmap, mCurrentPhotoPath);
+
+                //비트맵 메모리 반환
+                imageBitmap.recycle();
+            } catch (IOException e) {
+                e.getStackTrace();
+            }
 
             writeImg_view.setImageBitmap(BitmapFactory.decodeFile(mCurrentPhotoPath));
-        }else if(requestCode == 20){
+        }
+        else if(requestCode == 20){
             sendPicture(data.getData());
             asd = String.valueOf(data.getData());
         }
 
     }
+    //카메라로 찍은 사진의 회전을 위하여 저장하는 부분.
+        public void saveExifFile(Bitmap imageBitmap, String savePath){
+            FileOutputStream fos = null;
+            File saveFile = null;
 
+            try{
+                saveFile = new File(savePath);
+                fos = new FileOutputStream(saveFile);
+                //원본형태를 유지해서 이미지 저장
+                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+
+            }catch(FileNotFoundException e){
+                //("FileNotFoundException", e.getMessage());
+            }catch(IOException e){
+                //("IOException", e.getMessage());
+            }finally {
+                try {
+                    if(fos != null) {
+                        fos.close();
+                    }
+                } catch (Exception e) {
+                }
+            }
+        }
 
 }

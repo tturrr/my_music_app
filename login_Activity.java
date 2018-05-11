@@ -71,6 +71,7 @@ public class login_Activity extends AppCompatActivity implements GoogleApiClient
     private static final int  RC_SIGN_IN = 10;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +86,8 @@ public class login_Activity extends AppCompatActivity implements GoogleApiClient
         pass_edit = (EditText) findViewById(R.id.login_pass_text);
 
         google_btn = (SignInButton)findViewById(R.id.google_login_btn);
+
+
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)      //구글 + 로그인 준비.
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -215,8 +218,11 @@ public class login_Activity extends AppCompatActivity implements GoogleApiClient
         login_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(login_Activity.this, MainActivity.class);
-                startActivity(intent);
+
+                if(id_edit==null){
+                    Toast.makeText(login_Activity.this,"아이디 또는 비밀번호를 적어주세요.",Toast.LENGTH_SHORT).show();
+                }
+                loginEvent();
             }
         });
 
@@ -230,6 +236,22 @@ public class login_Activity extends AppCompatActivity implements GoogleApiClient
                 startActivityForResult(intent, 0);
             }
         });
+
+        mAuthListener = new FirebaseAuth.AuthStateListener(){
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                        if(user != null){
+                            //로그인
+                            Intent intent = new Intent(login_Activity.this, MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }else {
+                            //로그아웃
+
+                        }
+            }
+        };
 
     }
 
@@ -328,6 +350,7 @@ public class login_Activity extends AppCompatActivity implements GoogleApiClient
             });
 
         }
+
 
         @Override
         public void onSessionOpenFailed(KakaoException exception) {
@@ -430,4 +453,20 @@ public class login_Activity extends AppCompatActivity implements GoogleApiClient
             mAuth.removeAuthStateListener(mAuthListener);
         }
     }
+
+    void loginEvent(){
+        mAuth.signInWithEmailAndPassword(id_edit.getText().toString(),pass_edit.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+
+                if(!task.isSuccessful()){
+                     //로그인 실패부분.
+                    Toast.makeText(login_Activity.this, task.getException().getMessage(),Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+
+
 }

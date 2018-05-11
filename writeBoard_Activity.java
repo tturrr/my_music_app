@@ -26,6 +26,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -293,6 +295,30 @@ public class writeBoard_Activity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 10) {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 4;
+            Bitmap imageBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, options);
+
+            try{
+                // 기본 카메라 모듈을 이용해 촬영할 경우 가끔씩 이미지가
+                // 회전되어 출력되는 경우가 존재하여
+                // 이미지를 상황에 맞게 회전시킨다
+                ExifInterface exif = new ExifInterface(mCurrentPhotoPath);
+                int exifOrientation = exif.getAttributeInt(
+                        ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                int exifDegree = exifOrientationToDegrees(exifOrientation);
+
+                //회전된 이미지를 다시 회전시켜 정상 출력
+                imageBitmap = rotate(imageBitmap, exifDegree);
+
+                //회전시킨 이미지를 저장
+                saveExifFile(imageBitmap, mCurrentPhotoPath);
+
+                //비트맵 메모리 반환
+                imageBitmap.recycle();
+            }catch (IOException e){
+                e.getStackTrace();
+            }
 
             writeImg_view.setImageBitmap(BitmapFactory.decodeFile(mCurrentPhotoPath));
         }else if(requestCode == 20){
@@ -303,7 +329,29 @@ public class writeBoard_Activity extends AppCompatActivity {
 
     }
 
+    public void saveExifFile(Bitmap imageBitmap, String savePath){
+        FileOutputStream fos = null;
+        File saveFile = null;
 
+        try{
+            saveFile = new File(savePath);
+            fos = new FileOutputStream(saveFile);
+            //원본형태를 유지해서 이미지 저장
+            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+
+        }catch(FileNotFoundException e){
+            //("FileNotFoundException", e.getMessage());
+        }catch(IOException e){
+            //("IOException", e.getMessage());
+        }finally {
+            try {
+                if(fos != null) {
+                    fos.close();
+                }
+            } catch (Exception e) {
+            }
+        }
+    }
 
 
 

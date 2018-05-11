@@ -1,5 +1,6 @@
 package com.example.user.music;
 
+import android.content.SharedPreferences;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -52,6 +53,14 @@ public class info_Activity extends AppCompatActivity {
         setContentView(R.layout.activity_info_);
         auth = FirebaseAuth.getInstance();
 
+        SharedPreferences ID = getSharedPreferences("ID", MODE_PRIVATE);
+        SharedPreferences nick = getSharedPreferences("nick", MODE_PRIVATE);
+        final SharedPreferences.Editor edit_name = nick.edit();
+
+        SharedPreferences id_img = getSharedPreferences("id_img",MODE_PRIVATE);
+        final SharedPreferences.Editor edit_id_img = id_img.edit();
+
+
         final String google_id = getIntent().getStringExtra("google_id");
 
         final String face_name = getIntent().getStringExtra("face_name");
@@ -80,6 +89,8 @@ public class info_Activity extends AppCompatActivity {
         }else if(google_id != null){
             Glide.with(this).load(auth.getCurrentUser().getPhotoUrl()).into(profile_image);
             profile_name.setText(auth.getCurrentUser().getDisplayName());
+        }else if(ID.getString("id","noID") != null){
+            profile_name.setText(ID.getString("id","noID"));
         }
 
 
@@ -148,7 +159,8 @@ public class info_Activity extends AppCompatActivity {
 
             }else if(face_email != null){
                 onClick_face_Logout();
-            }else{
+            }
+            else{
                 auth.signOut();
                 Intent intent = new Intent(info_Activity.this,login_Activity.class);
                 startActivity(intent);

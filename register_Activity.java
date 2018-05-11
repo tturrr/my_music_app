@@ -1,6 +1,6 @@
 package com.example.user.music;
-
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -23,6 +23,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.UploadTask;
 
+import java.util.ArrayList;
+
 public class register_Activity extends AppCompatActivity {
 
     private static final int PICK_FROM_ALBUM = 10;
@@ -35,13 +37,15 @@ public class register_Activity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private Uri imageUri;
     private ImageView profile_view;
-
-
+    ArrayList<String> id_List;
+    String ID_check;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_);
         back_imgbtn = (ImageButton)findViewById(R.id.back_imgbutton);
+        final SharedPreferences ID = getSharedPreferences("ID", MODE_PRIVATE);
+        final SharedPreferences.Editor edit_ID = ID.edit();
 
         profile_view = (ImageView)findViewById(R.id.profile_image);
         register_suc_btn = (Button)findViewById(R.id.register_suc_btn);
@@ -97,8 +101,36 @@ public class register_Activity extends AppCompatActivity {
 
                     imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.kakao_default);
                 }
+                else if(!ID.getString(edit_id,"noID").equals("noID")){ //ID라는 SharedPreference안에 값이 있는지 확인하기 위한 절차가 필요
+                    Toast.makeText(register_Activity.this, "이미 사용중인 ID 입니다. 다른 ID를 입력해주세요", Toast.LENGTH_SHORT).show();
 
-                else {
+                }
+                else{
+
+                    Toast.makeText(register_Activity.this, "사용 가능한 ID입니다.", Toast.LENGTH_SHORT).show();
+                    ID_check = edit_id;
+
+
+                    SharedPreferences nick = getSharedPreferences("nick", MODE_PRIVATE);
+                    SharedPreferences.Editor edit_name = nick.edit();
+                    SharedPreferences password = getSharedPreferences("password", MODE_PRIVATE);
+                    SharedPreferences.Editor edit_passwrod = password.edit();
+                    SharedPreferences id_img = getSharedPreferences("id_img",0);
+                    SharedPreferences.Editor edit_id_img = id_img.edit();
+
+
+                    edit_ID.putString(edit_id, edit_id);
+                    edit_name.putString(edit_id, edit_nick);
+                    edit_passwrod.putString(edit_id,edit_pass);
+                    edit_id_img.putString(edit_id, String.valueOf(imageUri));
+
+                    edit_ID.commit();
+                    edit_name.commit();
+                    edit_passwrod.commit();
+                    edit_id_img.commit();
+
+
+
                     mAuth
                             .createUserWithEmailAndPassword(register_id_edit.getText().toString(),register_pass_edit.getText().toString())
                             .addOnCompleteListener(register_Activity.this, new OnCompleteListener<AuthResult>() {
@@ -118,6 +150,8 @@ public class register_Activity extends AppCompatActivity {
                                             userModel.userName = edit_nick;
                                             userModel.profileImageUrl = imageUrl;
                                             userModel.uid = mAuth.getUid();
+
+
 
 
                                             FirebaseDatabase.getInstance().getReference().child("users").child(uid).setValue(userModel).addOnSuccessListener(new OnSuccessListener<Void>() {

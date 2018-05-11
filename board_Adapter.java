@@ -1,6 +1,9 @@
 package com.example.user.music;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,7 +59,10 @@ public class board_Adapter extends BaseAdapter{
             viewholder = (ViewHolder)convertView.getTag();
         }
         viewholder.title_textView.setText(list_itemArrayList.get(position).getTitle());
+
+
         viewholder.board_img.setImageURI(list_itemArrayList.get(position).getBod_img());
+
 
 
 
@@ -75,5 +81,30 @@ public class board_Adapter extends BaseAdapter{
         CheckBox checkBox;
 
     }
+
+    private int exifOrientationToDegrees(int exifOrientation) {
+        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
+            return 90;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
+            return 180;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
+            return 270;
+        }
+        return 0;
+    }
+
+
+
+    private Bitmap rotate(Bitmap src, float degree) {
+
+// Matrix 객체 생성
+        Matrix matrix = new Matrix();
+// 회전 각도 셋팅
+        matrix.postRotate(degree);
+// 이미지와 Matrix 를 셋팅해서 Bitmap 객체 생성
+        return Bitmap.createBitmap(src, 0, 0, src.getWidth(),
+                src.getHeight(), matrix, true);
+    }
+
 
 }
