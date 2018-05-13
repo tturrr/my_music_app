@@ -2,9 +2,12 @@ package com.example.user.music;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
@@ -33,6 +36,12 @@ public class board_Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_board_);
 
+        Intent intent = getIntent();
+        final String login_id = intent.getStringExtra("login_id");
+        final SharedPreferences ID = getSharedPreferences("id", MODE_PRIVATE);
+        final SharedPreferences.Editor edit_ID = ID.edit();
+
+
         akey_save = getSharedPreferences("akey",0);
         a = akey_save.getInt("akey1",0);
 
@@ -54,6 +63,7 @@ public class board_Activity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(board_Activity.this,writeBoard_Activity.class);
+                intent.putExtra("login_id",login_id);
                 startActivityForResult(intent,100);
             }
         });
@@ -98,6 +108,7 @@ public class board_Activity extends AppCompatActivity {
 
         for (int i = 1; i <= a ; i++) {
 
+
             String tit = title_txt1.getString(String.valueOf(i), "no_title");
             String cont = content1.getString(String.valueOf(i), "no_contents");
             String image = img.getString(String.valueOf(i),"no");
@@ -129,6 +140,7 @@ public class board_Activity extends AppCompatActivity {
                 Intent intent = new Intent(board_Activity.this, boardModify_Activity.class);
                 check_position = list_num.get(board_listView.getCheckedItemPosition());
                 intent.putExtra("position", check_position);
+                intent.putExtra("login_id",login_id);
 
                 startActivityForResult(intent, 2002);
             }
@@ -206,6 +218,7 @@ public class board_Activity extends AppCompatActivity {
                 String contents_main = content1.getString(String.valueOf(i), "no_contents");
                 String image = img.getString(String.valueOf(i),"no");
 
+
                 Uri get_uri = Uri.parse(image);
 
 
@@ -225,7 +238,16 @@ public class board_Activity extends AppCompatActivity {
         }
     }
 
-
+    public Bitmap StringToBitMap(String encodedString){ // 스트링으로 받은 이미지를 비트맵으로 다시 변환
+        try{
+            byte [] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
+            Bitmap bitmap= BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+            return bitmap;
+        }catch(Exception e){
+            e.getMessage();
+            return null;
+        }
+    }
 
     }
 

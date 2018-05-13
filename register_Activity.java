@@ -1,6 +1,14 @@
 package com.example.user.music;
+
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -23,6 +31,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class register_Activity extends AppCompatActivity {
@@ -35,7 +45,7 @@ public class register_Activity extends AppCompatActivity {
     Button register_suc_btn;
     EditText register_nick_edit;
     private FirebaseAuth mAuth;
-    private Uri imageUri;
+    private String asd;
     private ImageView profile_view;
     ArrayList<String> id_List;
     String ID_check;
@@ -44,7 +54,7 @@ public class register_Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_);
         back_imgbtn = (ImageButton)findViewById(R.id.back_imgbutton);
-        final SharedPreferences ID = getSharedPreferences("ID", MODE_PRIVATE);
+        final SharedPreferences ID = getSharedPreferences("id", MODE_PRIVATE);
         final SharedPreferences.Editor edit_ID = ID.edit();
 
         profile_view = (ImageView)findViewById(R.id.profile_image);
@@ -69,9 +79,7 @@ public class register_Activity extends AppCompatActivity {
         profile_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
-                startActivityForResult(intent,PICK_FROM_ALBUM);
+                selectGallery();
             }
         });
 
@@ -97,9 +105,9 @@ public class register_Activity extends AppCompatActivity {
                 }
                 else if(edit_confpass.isEmpty()){
                     Toast.makeText(register_Activity.this,"비밀번호 확인 란을 입력해주세요.",Toast.LENGTH_SHORT).show();
-                }else if(null == imageUri){
+                }else if(null == asd){
 
-                    imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.kakao_default);
+                    asd = String.valueOf(Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.kakao_default));
                 }
                 else if(!ID.getString(edit_id,"noID").equals("noID")){ //ID라는 SharedPreference안에 값이 있는지 확인하기 위한 절차가 필요
                     Toast.makeText(register_Activity.this, "이미 사용중인 ID 입니다. 다른 ID를 입력해주세요", Toast.LENGTH_SHORT).show();
@@ -122,14 +130,12 @@ public class register_Activity extends AppCompatActivity {
                     edit_ID.putString(edit_id, edit_id);
                     edit_name.putString(edit_id, edit_nick);
                     edit_passwrod.putString(edit_id,edit_pass);
-                    edit_id_img.putString(edit_id, String.valueOf(imageUri));
+                    edit_id_img.putString(edit_id, String.valueOf(asd));
 
                     edit_ID.commit();
                     edit_name.commit();
                     edit_passwrod.commit();
                     edit_id_img.commit();
-
-
 
                     mAuth
                             .createUserWithEmailAndPassword(register_id_edit.getText().toString(),register_pass_edit.getText().toString())
@@ -138,8 +144,7 @@ public class register_Activity extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     final String uid = task.getResult().getUser().getUid();
 
-
-                                    FirebaseStorage.getInstance().getReference().child("userImages").child(uid).putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                    FirebaseStorage.getInstance().getReference().child("userImages").child(uid).putFile(Uri.parse(asd)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                                         @Override
                                         public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
 
@@ -157,7 +162,8 @@ public class register_Activity extends AppCompatActivity {
                                             FirebaseDatabase.getInstance().getReference().child("users").child(uid).setValue(userModel).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
-                                                    intent.putExtra("id",edit_id);
+                                                    intent.putExtra("login_id",edit_id);
+
                                                     setResult(100,intent);
                                                     finish();
                                                 }
@@ -179,9 +185,86 @@ public class register_Activity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == PICK_FROM_ALBUM && resultCode == RESULT_OK){
-            profile_view.setImageURI(data.getData()); // 이미지뷰를 변경함.
-            imageUri = data.getData();//이미지 경로 원본
+        if(requestCode == 20 && resultCode == RESULT_OK){
+
+
+            sendPicture(data.getData()); // 이미지뷰를 변경함.
+            asd = String.valueOf(data.getData()); //이미지 경로 원본
         }
     }
+
+
+    private void selectGallery() {
+
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        startActivityForResult(intent, 20);
+    }
+
+    //갤러리에서 사진을 가져오기
+    private Uri sendPicture(Uri imgUri) {
+
+        String imagePath = getRealPathFromURI(imgUri); // path 경로
+        ExifInterface exif = null;
+        try {
+            exif = new ExifInterface(imagePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        int exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+        int exifDegree = exifOrientationToDegrees(exifOrientation);
+
+        Bitmap bitmap = BitmapFactory.decodeFile(imagePath);//경로를 통해 비트맵으로 전환
+        profile_view.setImageBitmap(rotate(bitmap, exifDegree));//이미지 뷰에 비트맵 넣기
+        Bitmap bitmap1 = ((BitmapDrawable)profile_view.getDrawable()).getBitmap();
+        return getImageUri(register_Activity.this,bitmap1);
+
+    }
+
+    //갤러리 사진의 절대경로 구하기.
+    private String getRealPathFromURI(Uri contentUri) {
+        int column_index=0;
+        String[] proj = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
+        if(cursor.moveToFirst()){
+            column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        }
+
+        return cursor.getString(column_index);
+    }
+
+
+    private int exifOrientationToDegrees(int exifOrientation) {
+        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
+            return 90;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
+            return 180;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
+            return 270;
+        }
+        return 0;
+    }
+
+
+
+    private Bitmap rotate(Bitmap src, float degree) {
+
+// Matrix 객체 생성
+        Matrix matrix = new Matrix();
+// 회전 각도 셋팅
+        matrix.postRotate(degree);
+// 이미지와 Matrix 를 셋팅해서 Bitmap 객체 생성
+        return Bitmap.createBitmap(src, 0, 0, src.getWidth(),
+                src.getHeight(), matrix, true);
+    }
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
+
+
 }

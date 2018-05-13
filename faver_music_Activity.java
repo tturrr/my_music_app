@@ -4,11 +4,11 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -24,6 +24,7 @@ public class faver_music_Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_faver_music_);
+
 
         getMusicList();
         requirePermission();

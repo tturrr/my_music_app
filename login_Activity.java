@@ -58,7 +58,7 @@ public class login_Activity extends AppCompatActivity implements GoogleApiClient
     EditText id_edit;
     EditText pass_edit;
 
-    String email, birth, name1, name2, profile_img_string;
+    String id, email, birth, name1, name2, profile_img_string;
 
     private CallbackManager callbackManager;  //페이스북 콜백매니저
 
@@ -244,6 +244,7 @@ public class login_Activity extends AppCompatActivity implements GoogleApiClient
                         if(user != null){
                             //로그인
                             Intent intent = new Intent(login_Activity.this, MainActivity.class);
+                            intent.putExtra("login_id",id_edit.getText().toString());
                             startActivity(intent);
                             finish();
                         }else {
@@ -267,7 +268,7 @@ public class login_Activity extends AppCompatActivity implements GoogleApiClient
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == 0) {
             if (resultCode == 100) {
-                String id = intent.getStringExtra("id");
+                id = intent.getStringExtra("login_id");
                 id_edit.setText(id);
             }
 

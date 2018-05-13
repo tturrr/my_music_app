@@ -1,6 +1,7 @@
 package com.example.user.music;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +10,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,6 +27,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -62,6 +65,8 @@ public class writeBoard_Activity extends AppCompatActivity {
         final SharedPreferences.Editor edit_bod_num = bod_num.edit();
         akey_save = getSharedPreferences("akey",0);
         a = akey_save.getInt("akey1",0);
+        Intent intent = getIntent();
+        final String login_id = intent.getStringExtra("login_id");
 
 
 
@@ -75,6 +80,9 @@ public class writeBoard_Activity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(writeBoard_Activity.this,board_Activity.class);
+                SharedPreferences login1_id = getSharedPreferences("id",0);
+
+                login1_id.getString(login_id,"no_id");
 
                 SharedPreferences img = getSharedPreferences("img",0);
                 SharedPreferences.Editor edit_img = img.edit();
@@ -108,9 +116,6 @@ public class writeBoard_Activity extends AppCompatActivity {
                 finish();
             }
         });
-
-
-
 
 
 
@@ -235,7 +240,7 @@ public class writeBoard_Activity extends AppCompatActivity {
     }
 
     //갤러리에서 사진을 가져오기
-    private void sendPicture(Uri imgUri) {
+    private Uri sendPicture(Uri imgUri) {
 
         String imagePath = getRealPathFromURI(imgUri); // path 경로
         ExifInterface exif = null;
@@ -249,7 +254,8 @@ public class writeBoard_Activity extends AppCompatActivity {
 
         Bitmap bitmap = BitmapFactory.decodeFile(imagePath);//경로를 통해 비트맵으로 전환
         writeImg_view.setImageBitmap(rotate(bitmap, exifDegree));//이미지 뷰에 비트맵 넣기
-
+        Bitmap bitmap1 = ((BitmapDrawable)writeImg_view.getDrawable()).getBitmap();
+        return getImageUri(writeBoard_Activity.this,bitmap1);
     }
 
     //갤러리 사진의 절대경로 구하기.
@@ -354,5 +360,10 @@ public class writeBoard_Activity extends AppCompatActivity {
     }
 
 
-
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
 }

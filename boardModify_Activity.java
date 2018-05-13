@@ -1,5 +1,6 @@
 package com.example.user.music;
 
+import android.content.Context;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,6 +27,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -146,7 +149,9 @@ public class boardModify_Activity extends AppCompatActivity {
                                 edit_contents.putString(String.valueOf(chk_position),content_txt.getText().toString()).commit();
 
                                 if(mCurrentPhotoPath==null){
-                                    edit_img.putString(String.valueOf(chk_position),gal).commit();
+
+
+                                    edit_img.putString(String.valueOf(chk_position), String.valueOf(gal)).commit();
                                 }else{
                                     edit_img.putString(String.valueOf(chk_position),urs).commit();
                                 }
@@ -281,7 +286,7 @@ public class boardModify_Activity extends AppCompatActivity {
     }
 
     //갤러리에서 사진을 가져오기
-    private void sendPicture(Uri imgUri) {
+    private Uri sendPicture(Uri imgUri) {
 
         String imagePath = getRealPathFromURI(imgUri); // path 경로
         ExifInterface exif = null;
@@ -294,7 +299,10 @@ public class boardModify_Activity extends AppCompatActivity {
         int exifDegree = exifOrientationToDegrees(exifOrientation);
 
         Bitmap bitmap = BitmapFactory.decodeFile(imagePath);//경로를 통해 비트맵으로 전환
+
         writeImg_view.setImageBitmap(rotate(bitmap, exifDegree));//이미지 뷰에 비트맵 넣기
+        Bitmap bitmap1 = ((BitmapDrawable)writeImg_view.getDrawable()).getBitmap();
+        return getImageUri(boardModify_Activity.this,bitmap1);
 
     }
 
@@ -369,8 +377,11 @@ public class boardModify_Activity extends AppCompatActivity {
             writeImg_view.setImageBitmap(BitmapFactory.decodeFile(mCurrentPhotoPath));
         }
         else if(requestCode == 20){
-            sendPicture(data.getData());
-            asd = String.valueOf(data.getData());
+
+
+
+            asd= String.valueOf(sendPicture(data.getData()));
+//            asd = String.valueOf(data.getData());
         }
 
     }
@@ -398,5 +409,14 @@ public class boardModify_Activity extends AppCompatActivity {
                 }
             }
         }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
+
 
 }

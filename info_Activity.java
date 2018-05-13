@@ -1,9 +1,9 @@
 package com.example.user.music;
 
-import android.content.SharedPreferences;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -53,11 +53,18 @@ public class info_Activity extends AppCompatActivity {
         setContentView(R.layout.activity_info_);
         auth = FirebaseAuth.getInstance();
 
+        Intent intent = getIntent();
+        String login_id = intent.getStringExtra("login_id");
+
         SharedPreferences ID = getSharedPreferences("ID", MODE_PRIVATE);
         SharedPreferences nick = getSharedPreferences("nick", MODE_PRIVATE);
+        String mynick = nick.getString(login_id,"");
         final SharedPreferences.Editor edit_name = nick.edit();
 
         SharedPreferences id_img = getSharedPreferences("id_img",MODE_PRIVATE);
+        String myimg = id_img.getString(login_id,"");
+
+
         final SharedPreferences.Editor edit_id_img = id_img.edit();
 
 
@@ -89,8 +96,10 @@ public class info_Activity extends AppCompatActivity {
         }else if(google_id != null){
             Glide.with(this).load(auth.getCurrentUser().getPhotoUrl()).into(profile_image);
             profile_name.setText(auth.getCurrentUser().getDisplayName());
-        }else if(ID.getString("id","noID") != null){
-            profile_name.setText(ID.getString("id","noID"));
+        }else {
+            profile_name.setText(mynick);
+            Uri uri = Uri.parse(myimg);
+            profile_image.setImageURI(uri);
         }
 
 

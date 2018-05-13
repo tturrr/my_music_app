@@ -14,6 +14,7 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout music_btn;
     LinearLayout friends_btn;
     LinearLayout board_btn;
+    String  login_id;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,11 +37,15 @@ public class MainActivity extends AppCompatActivity {
          final String kakao_name = getIntent().getStringExtra("kakao_name");
          final long kakao_number = getIntent().getLongExtra("kakao_number",0);
 
+         Intent intent = getIntent();
+        login_id = intent.getStringExtra("login_id");
+
          //메모장으로 이동한다
         board_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this,board_Activity.class);
+                intent.putExtra("login_id",login_id);
                 startActivity(intent);
             }
         });
@@ -89,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("kakao_name",kakao_name);
                 intent.putExtra("kakao_number",kakao_number);
                 intent.putExtra("google_id",google_id);
+                intent.putExtra("login_id",login_id);
                 startActivityForResult(intent,0);
             }
         });
