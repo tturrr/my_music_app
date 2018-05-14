@@ -1,11 +1,18 @@
 package com.example.user.music;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        passPushTokenToServer();
 
         board_btn = (LinearLayout)findViewById(R.id.board_btn);
         chat_btn = (LinearLayout)findViewById(R.id.chat_btn);
@@ -99,6 +107,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    void passPushTokenToServer(){
+
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String token = FirebaseInstanceId.getInstance().getToken();
+
+        Map<String,Object>map = new HashMap<>();
+        map.put("pushToken",token);
+
+        FirebaseDatabase.getInstance().getReference().child("users").child(uid).updateChildren(map);
     }
 
 

@@ -54,19 +54,20 @@ public class writeBoard_Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write_board_);
-
+        Intent intent = getIntent();
+        final String login_id = intent.getStringExtra("login_id");
         write_cmr_btn = (ImageView)findViewById(R.id.write_cmr_btn);
         writeImg_view = (ImageView)findViewById(R.id.writeImg_view);
         write_btn = (ImageView)findViewById(R.id.write_btn);
         back_btn = (ImageButton)findViewById(R.id.back_imgbutton);
         content_txt = (EditText)findViewById(R.id.content_txt);
         title_txt = (EditText)findViewById(R.id.title_txt);
-        final SharedPreferences bod_num = getSharedPreferences("bod_num",0);
+        final SharedPreferences bod_num = getSharedPreferences(login_id+"bod_num",0);
         final SharedPreferences.Editor edit_bod_num = bod_num.edit();
-        akey_save = getSharedPreferences("akey",0);
-        a = akey_save.getInt("akey1",0);
-        Intent intent = getIntent();
-        final String login_id = intent.getStringExtra("login_id");
+        akey_save = getSharedPreferences(login_id+"akey",0);
+        a = akey_save.getInt(login_id+"akey1",0);
+
+
 
 
 
@@ -80,11 +81,8 @@ public class writeBoard_Activity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(writeBoard_Activity.this,board_Activity.class);
-                SharedPreferences login1_id = getSharedPreferences("id",0);
 
-                login1_id.getString(login_id,"no_id");
-
-                SharedPreferences img = getSharedPreferences("img",0);
+                SharedPreferences img = getSharedPreferences(login_id+"img",0);
                 SharedPreferences.Editor edit_img = img.edit();
                 String urs = mCurrentPhotoPath;
                 String gal = asd;
@@ -92,19 +90,19 @@ public class writeBoard_Activity extends AppCompatActivity {
 
 
 
-                SharedPreferences akey_save = getSharedPreferences("akey",0);
+                SharedPreferences akey_save = getSharedPreferences(login_id+"akey",0);
                 SharedPreferences.Editor akey_editor = akey_save.edit();
                 a++;
 
-                SharedPreferences title_txt1 = getSharedPreferences("title_txt",0);
+                SharedPreferences title_txt1 = getSharedPreferences(login_id+"title_txt",0);
                 SharedPreferences.Editor title_txt_editor = title_txt1.edit();
 
-                SharedPreferences content1 = getSharedPreferences("content_txt",0);
+                SharedPreferences content1 = getSharedPreferences(login_id+"content_txt",0);
                 SharedPreferences.Editor content_txt_editor = content1.edit();
 
                 content_txt_editor.putString(String.valueOf(a),content_txt.getText().toString()).commit();
                 title_txt_editor.putString(String.valueOf(a),title_txt.getText().toString()).commit();
-                akey_editor.putInt("akey1",a).commit();
+                akey_editor.putInt(login_id+"akey1",a).commit();
                 if(mCurrentPhotoPath == null){
                     edit_img.putString(String.valueOf(a),gal).commit();
                 }else {

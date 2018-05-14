@@ -59,6 +59,8 @@ public class boardModify_Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_board_modify_);
 
+        Intent intent = getIntent();
+        final String login_id = intent.getStringExtra("login_id");
 
         back_imgbutton = (ImageButton)findViewById(R.id.back_imgbutton);
         img_btn = (ImageView)findViewById(R.id.img_btn);
@@ -68,9 +70,9 @@ public class boardModify_Activity extends AppCompatActivity {
         content_txt = (EditText)findViewById(R.id.content_txt);
         writeImg_view = (ImageView)findViewById(R.id.writeImg_view);
 
-        title_txt1 = getSharedPreferences("title_txt", 0);
-        content1 = getSharedPreferences("content_txt",0);
-        img = getSharedPreferences("img",0);
+        title_txt1 = getSharedPreferences(login_id+"title_txt", 0);
+        content1 = getSharedPreferences(login_id+"content_txt",0);
+        img = getSharedPreferences(login_id+"img",0);
 
         final int chk_position = getIntent().getIntExtra("position",0);
         int chk = chk_position;
@@ -78,7 +80,7 @@ public class boardModify_Activity extends AppCompatActivity {
         title_txt.setText(title_txt1.getString(String.valueOf(chk),"no_title"));
         content_txt.setText(content1.getString(String.valueOf(chk),"no_content"));
         String image = img.getString(String.valueOf(chk),"sad");
-        Uri get_uri = Uri.parse(image);
+        final Uri get_uri = Uri.parse(image);
         writeImg_view.setImageURI(get_uri);
 
 
@@ -134,9 +136,9 @@ public class boardModify_Activity extends AppCompatActivity {
 
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                title_txt1 = getSharedPreferences("title_txt", 0);
-                                content1 = getSharedPreferences("content_txt",0);
-                                img = getSharedPreferences("img",0);
+                                title_txt1 = getSharedPreferences(login_id+"title_txt", 0);
+                                content1 = getSharedPreferences(login_id+"content_txt",0);
+                                img = getSharedPreferences(login_id+"img",0);
 
                                 SharedPreferences.Editor edit_title = title_txt1.edit();
                                 SharedPreferences.Editor edit_contents = content1.edit();
@@ -186,7 +188,7 @@ public class boardModify_Activity extends AppCompatActivity {
 
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                title_txt1 = getSharedPreferences("title_txt", 0);
+                                title_txt1 = getSharedPreferences(login_id+"title_txt", 0);
 
 
                                 SharedPreferences.Editor edit_title = title_txt1.edit();

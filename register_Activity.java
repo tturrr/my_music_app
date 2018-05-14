@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.UploadTask;
@@ -120,7 +121,7 @@ public class register_Activity extends AppCompatActivity {
 
 
                     SharedPreferences nick = getSharedPreferences("nick", MODE_PRIVATE);
-                    SharedPreferences.Editor edit_name = nick.edit();
+                    final SharedPreferences.Editor edit_name = nick.edit();
                     SharedPreferences password = getSharedPreferences("password", MODE_PRIVATE);
                     SharedPreferences.Editor edit_passwrod = password.edit();
                     SharedPreferences id_img = getSharedPreferences("id_img",0);
@@ -143,6 +144,10 @@ public class register_Activity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     final String uid = task.getResult().getUser().getUid();
+                                    UserProfileChangeRequest userProfileChangeRequest = new UserProfileChangeRequest.Builder().setDisplayName(edit_nick).build();
+
+                                    task.getResult().getUser().updateProfile(userProfileChangeRequest);
+
 
                                     FirebaseStorage.getInstance().getReference().child("userImages").child(uid).putFile(Uri.parse(asd)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                                         @Override
