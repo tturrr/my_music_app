@@ -6,6 +6,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.kakao.usermgmt.UserManagement;
+import com.kakao.usermgmt.callback.LogoutResponseCallback;
+
 public class intro_Activity extends AppCompatActivity {
     ImageView imageView;
 
@@ -23,7 +26,7 @@ public class intro_Activity extends AppCompatActivity {
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(intro_Activity.this, login_Activity.class);
+                Intent intent = new Intent(intro_Activity.this,login_Activity.class);
                 startActivity(intent);
                 finish();
             }
@@ -32,6 +35,15 @@ public class intro_Activity extends AppCompatActivity {
 
     }
 
-
+//    private void onClick_kakao_Logout() {
+//        UserManagement.requestLogout(new LogoutResponseCallback() {
+//            @Override
+//            public void onCompleteLogout() {
+//                // 원하는 코드 ( 예를 들면 액티비티 이동)
+//                Intent intent = new Intent(intro_Activity.this,login_Activity.class);
+//                startActivity(intent);
+//            }
+//        });
+//    }
 
 }

@@ -10,6 +10,8 @@ import android.widget.LinearLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.kakao.usermgmt.UserManagement;
+import com.kakao.usermgmt.callback.LogoutResponseCallback;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        passPushTokenToServer();
 
         board_btn = (LinearLayout)findViewById(R.id.board_btn);
         chat_btn = (LinearLayout)findViewById(R.id.chat_btn);
@@ -106,20 +107,20 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent,0);
             }
         });
-
+        passPushTokenToServer();
     }
 
     void passPushTokenToServer(){
 
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         String token = FirebaseInstanceId.getInstance().getToken();
-
-        Map<String,Object>map = new HashMap<>();
+        Map<String,Object> map = new HashMap<>();
         map.put("pushToken",token);
 
         FirebaseDatabase.getInstance().getReference().child("users").child(uid).updateChildren(map);
-    }
 
+
+    }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Check which request it is that we're responding to

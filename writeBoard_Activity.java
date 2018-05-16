@@ -345,8 +345,6 @@ public class writeBoard_Activity extends AppCompatActivity {
 
         }catch(FileNotFoundException e){
             //("FileNotFoundException", e.getMessage());
-        }catch(IOException e){
-            //("IOException", e.getMessage());
         }finally {
             try {
                 if(fos != null) {
