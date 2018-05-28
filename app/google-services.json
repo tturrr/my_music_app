@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "42896064910",
+    "firebase_url": "https://music-nomo.firebaseio.com",
+    "project_id": "music-nomo",
+    "storage_bucket": "music-nomo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:42896064910:android:92c744695e383ca0",
+        "android_client_info": {
+          "package_name": "com.example.user.music"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "42896064910-epbavt50o3b3c4be8hkvfds0987j0ctk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.user.music",
+            "certificate_hash": "b9a89e27f6a6b6812c504750259df2226098366c"
+          }
+        },
+        {
+          "client_id": "42896064910-dctk9n895qa6ep6a20btm73jnjprvbdg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwI9fqRWwcBqnf4zd19dW-BPqL5qjdcVY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "42896064910-dctk9n895qa6ep6a20btm73jnjprvbdg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
