@@ -35,18 +35,25 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView">
+
         <TextView
 
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="노래 듣기"
-            android:paddingRight="30dp"
             android:drawableLeft="@drawable/music_basic_icon"
             android:gravity="center"
-            android:textSize="25dp"/>
+            android:paddingRight="30dp"
+            android:text="노래 듣기"
+            android:textSize="25dp" />
+
+
 
 
     </LinearLayout>
+
+
+
+
 
     <ImageView
         android:id="@+id/info_img"
@@ -60,4 +67,113 @@
         app:layout_constraintStart_toEndOf="@+id/textView"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/shelter" />
+
+    <LinearLayout
+        android:id="@+id/chat_btn"
+        android:layout_width="395dp"
+        android:layout_height="60dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/music_btn"
+        android:background="#ffffff">
+
+
+        <TextView
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:drawableLeft="@drawable/chat_icon"
+            android:gravity="center"
+            android:paddingRight="30dp"
+            android:text="채팅"
+            android:textSize="25dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/friend_btn"
+        android:layout_width="395dp"
+        android:layout_height="60dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:background="#ffffff"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chat_btn">
+
+
+        <TextView
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:drawableLeft="@drawable/friends_icon"
+            android:gravity="center"
+            android:paddingRight="30dp"
+            android:text="친구 목록"
+            android:textSize="25dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/board_btn"
+        android:layout_width="395dp"
+        android:layout_height="60dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/friend_btn"
+        android:background="#ffffff">
+
+
+        <TextView
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:drawableLeft="@drawable/note_icon"
+            android:gravity="center"
+            android:paddingRight="30dp"
+            android:text="메모장"
+            android:textSize="25dp" />
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/game_linearLayout"
+        android:layout_width="395dp"
+        android:layout_height="60dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/board_btn"
+        android:background="#ffffff">
+
+
+        <TextView
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:drawableLeft="@drawable/game_icon"
+            android:gravity="center"
+            android:paddingRight="30dp"
+            android:text="미니 게임"
+            android:textSize="25dp" />
+
+
+    </LinearLayout>
+
+
+
 </android.support.constraint.ConstraintLayout>

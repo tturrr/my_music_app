@@ -2,23 +2,13 @@ package com.example.user.music;
 
 
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.graphics.BitmapFactory;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Base64;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-
-import android.content.pm.Signature;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -29,39 +19,58 @@ import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.Profile;
-import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.kakao.auth.ErrorCode;
 import com.kakao.auth.ISessionCallback;
 import com.kakao.auth.Session;
 import com.kakao.network.ErrorResult;
-import com.kakao.usermgmt.LoginButton;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.MeResponseCallback;
 import com.kakao.usermgmt.response.model.UserProfile;
 import com.kakao.util.exception.KakaoException;
-import com.kakao.util.helper.log.Tag;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class login_Activity extends AppCompatActivity {
+import java.util.Arrays;
+
+public class login_Activity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     Button register_button;
     Button login_button;
+    SignInButton google_btn;
+    private GoogleApiClient mGoogleApiClient;
 
     EditText id_edit;
     EditText pass_edit;
 
-    String email, birth, name1, name2, profile_img_string;
+    String id, email, birth, name1, name2, profile_img_string;
 
     private CallbackManager callbackManager;  //페이스북 콜백매니저
 
     private com.kakao.usermgmt.LoginButton btnKakao;
     private SessionCallback callback; //카카오 세션콜백
 
+    private FirebaseAuth mAuth;
     private static final String TAG = "MainActivity";
     com.facebook.login.widget.LoginButton face_login; //페이스북 로그인 버튼
+    private static final int  RC_SIGN_IN = 10;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,11 +78,28 @@ public class login_Activity extends AppCompatActivity {
         FacebookSdk.sdkInitialize(getApplicationContext());//페이스북 버튼을 사용하는 경우에 페이스북sdk를 초기화해주는 작업 안하면 레이아웃에 버튼을 추가하는 것만으로 에러가 생긴다.
         setContentView(R.layout.activity_login_);
 
+        mAuth = FirebaseAuth.getInstance();
         register_button = (Button) findViewById(R.id.register_button);
         login_button = (Button) findViewById(R.id.login_button);
 
         id_edit = (EditText) findViewById(R.id.login_id_text);
         pass_edit = (EditText) findViewById(R.id.login_pass_text);
+
+        google_btn = (SignInButton)findViewById(R.id.google_login_btn);
+
+
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)      //구글 + 로그인 준비.
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this,this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+
 
         callback = new SessionCallback(); //세션콜백을 부르고
         Session.getCurrentSession().addCallback(callback); // 추가시키면 끝입니다!!
@@ -82,6 +108,33 @@ public class login_Activity extends AppCompatActivity {
         callbackManager = CallbackManager.Factory.create(); //페북 세션콜백
         face_login = (com.facebook.login.widget.LoginButton) findViewById(R.id.login_facebook);
         face_login.setReadPermissions(Arrays.asList("public_profile","email","user_birthday"));
+
+
+        google_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+                startActivityForResult(signInIntent, RC_SIGN_IN);
+            }
+        });
+
+        mAuthListener =  new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                                FirebaseUser user = firebaseAuth.getCurrentUser();
+                                if (user != null) {
+                                        // User is signed in
+                                               Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                                    } else {
+                                       // User is signed out
+                                               Log.d(TAG, "onAuthStateChanged:signed_out");
+                                    }
+                                // [START_EXCLUDE]
+
+                                // [END_EXCLUDE]
+                                   }
+        };
+
 
 
             //온컴플리트는 이미 정보를 받아온상태에서 진행하는 부분이다.
@@ -165,8 +218,11 @@ public class login_Activity extends AppCompatActivity {
         login_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(login_Activity.this, MainActivity.class);
-                startActivity(intent);
+
+                if(id_edit==null){
+                    Toast.makeText(login_Activity.this,"아이디 또는 비밀번호를 적어주세요.",Toast.LENGTH_SHORT).show();
+                }
+                loginEvent();
             }
         });
 
@@ -180,6 +236,23 @@ public class login_Activity extends AppCompatActivity {
                 startActivityForResult(intent, 0);
             }
         });
+
+        mAuthListener = new FirebaseAuth.AuthStateListener(){
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                        if(user != null){
+                            //로그인
+                            Intent intent = new Intent(login_Activity.this, MainActivity.class);
+                            intent.putExtra("login_id",id_edit.getText().toString());
+                            startActivity(intent);
+                            finish();
+                        }else {
+                            //로그아웃
+
+                        }
+            }
+        };
 
     }
 
@@ -195,7 +268,7 @@ public class login_Activity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == 0) {
             if (resultCode == 100) {
-                String id = intent.getStringExtra("id");
+                id = intent.getStringExtra("login_id");
                 id_edit.setText(id);
             }
 
@@ -203,9 +276,27 @@ public class login_Activity extends AppCompatActivity {
         //페이스북 로그인 콜백을 받기위해 .
         callbackManager.onActivityResult(requestCode, resultCode, intent);
 
+        //구글 로그인 관련.
+        if (requestCode == RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(intent);
+            if (result.isSuccess()) {
+                // Google Sign In was successful, authenticate with Firebase
+                GoogleSignInAccount account = result.getSignInAccount();
+
+                firebaseAuthWithGoogle(account);
+            } else {
+                // Google Sign In failed, update UI appropriately
+                // ...
+            }
+        }
+
+
     }
 
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
 
 
     //카카오톡 세션콜백.
@@ -260,6 +351,7 @@ public class login_Activity extends AppCompatActivity {
             });
 
         }
+
 
         @Override
         public void onSessionOpenFailed(KakaoException exception) {
@@ -323,5 +415,59 @@ public class login_Activity extends AppCompatActivity {
         }
         return 0;
     }
+
+    private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
+        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
+
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(login_Activity.this,"로그인이 되었습니다.",Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(login_Activity.this,MainActivity.class);
+                            intent.putExtra("google_id",acct.getId());
+                            onStart();
+                            startActivity(intent);
+                            finish();
+                        } else {
+
+                            // If sign in fails, display a message to the user.
+
+                        }
+
+                        // ...
+                    }
+                });
+    }
+
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        mAuth.addAuthStateListener(mAuthListener);
+
+    }
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
+
+    void loginEvent(){
+        mAuth.signInWithEmailAndPassword(id_edit.getText().toString(),pass_edit.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+
+                if(!task.isSuccessful()){
+                     //로그인 실패부분.
+                    Toast.makeText(login_Activity.this, task.getException().getMessage(),Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+
 
 }

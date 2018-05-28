@@ -35,13 +35,13 @@
         android:layout_width="68dp"
         android:layout_height="50dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="144dp"
+        android:layout_marginTop="8dp"
         android:gravity="center"
-        android:text="아이디"
+        android:text="이메일"
         android:textColor="#ffffff"
         android:textSize="20dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/back_imgbutton" />
+        app:layout_constraintTop_toBottomOf="@+id/nick_txt" />
 
     <EditText
         android:id="@+id/register_id_edit"
@@ -49,15 +49,15 @@
         android:layout_height="50dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="144dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/button"
         android:ems="10"
-        android:hint="아이디를 입력해주세요."
+        android:hint="이메일을 입력해주세요."
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.873"
+        app:layout_constraintHorizontal_bias="0.918"
         app:layout_constraintStart_toEndOf="@+id/textView3"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+        app:layout_constraintTop_toBottomOf="@+id/nick_txt" />
 
     <TextView
         android:id="@+id/textView4"
@@ -65,10 +65,10 @@
         android:layout_height="50dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:gravity="center"
         android:text="비밀번호"
         android:textColor="#ffffff"
         android:textSize="20dp"
-        android:gravity="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
@@ -84,7 +84,7 @@
         android:hint="비밀번호를 입력해주세요"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.876"
+        app:layout_constraintHorizontal_bias="0.92"
         app:layout_constraintStart_toEndOf="@+id/textView4"
         app:layout_constraintTop_toBottomOf="@+id/register_id_edit" />
 
@@ -94,10 +94,10 @@
         android:layout_height="50dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="비밀번호 확인"
-        android:textSize="20dp"
-        android:textColor="#ffffff"
         android:gravity="center"
+        android:text="비밀번호 확인"
+        android:textColor="#ffffff"
+        android:textSize="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
@@ -106,6 +106,7 @@
         android:layout_width="221dp"
         android:layout_height="50dp"
 
+        android:layout_marginEnd="12dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/button"
@@ -113,7 +114,7 @@
         android:hint="비밀번호를 입력해주세요."
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.652"
+        app:layout_constraintHorizontal_bias="0.846"
         app:layout_constraintStart_toEndOf="@+id/textView5"
         app:layout_constraintTop_toBottomOf="@+id/register_pass_edit" />
 
@@ -131,6 +132,48 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/nick_txt1"
+        android:layout_width="68dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="152dp"
+        android:gravity="center"
+        android:text="닉네임"
+        android:textColor="#ffffff"
+        android:textSize="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/back_imgbutton" />
+
+    <EditText
+        android:id="@+id/nick_txt"
+        android:layout_width="221dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="152dp"
+        android:background="@drawable/button"
+        android:ems="10"
+        android:hint="닉네임을 적어주세요."
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.924"
+        app:layout_constraintStart_toEndOf="@+id/nick_txt1"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+    <ImageView
+        android:id="@+id/profile_image"
+        android:layout_width="128dp"
+        android:layout_height="119dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/nick_txt"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        app:srcCompat="@drawable/kakao_default_profile_image" />
 
 
 </android.support.constraint.ConstraintLayout>

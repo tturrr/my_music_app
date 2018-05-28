@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">music</string>
+    <string name="ocr_result_tip">인식 결과는 여기에 나타납니다.</string>
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
 </resources>

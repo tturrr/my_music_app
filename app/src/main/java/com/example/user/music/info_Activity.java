@@ -3,14 +3,15 @@ package com.example.user.music;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
@@ -18,7 +19,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -28,17 +28,12 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.facebook.login.LoginManager;
+import com.google.firebase.auth.FirebaseAuth;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.LogoutResponseCallback;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -50,11 +45,30 @@ public class info_Activity extends AppCompatActivity {
     ImageView profile_image;
     TextView profile_name;
     private String mCurrentPhotoPath;
+    private  FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info_);
+        auth = FirebaseAuth.getInstance();
+
+        Intent intent = getIntent();
+        final String login_id = intent.getStringExtra("login_id");
+
+        SharedPreferences ID = getSharedPreferences("ID", MODE_PRIVATE);
+        SharedPreferences nick = getSharedPreferences("nick", MODE_PRIVATE);
+        String mynick = nick.getString(login_id,"");
+        final SharedPreferences.Editor edit_name = nick.edit();
+
+        SharedPreferences id_img = getSharedPreferences("id_img",MODE_PRIVATE);
+        String myimg = id_img.getString(login_id,"");
+
+
+        final SharedPreferences.Editor edit_id_img = id_img.edit();
+
+
+        final String google_id = getIntent().getStringExtra("google_id");
 
         final String face_name = getIntent().getStringExtra("face_name");
         final String face_birth = getIntent().getStringExtra("face_birth");
@@ -79,6 +93,13 @@ public class info_Activity extends AppCompatActivity {
         }else if(face_email != null){
             Glide.with(this).load(face_img).into(profile_image); //글라이드라이브러리를 사용하여 url 이미지를 바로 이미지뷰에 로드시킨다.
             profile_name.setText(face_name);
+        }else if(google_id != null){
+            Glide.with(this).load(auth.getCurrentUser().getPhotoUrl()).into(profile_image);
+            profile_name.setText(auth.getCurrentUser().getDisplayName());
+        }else {
+            profile_name.setText(mynick);
+            Uri uri = Uri.parse(myimg);
+            profile_image.setImageURI(uri);
         }
 
 
@@ -87,7 +108,7 @@ public class info_Activity extends AppCompatActivity {
             public void onClick(final View v) {
                 AlertDialog.Builder dialog = new AlertDialog.Builder(info_Activity.this);
                 dialog.setTitle("알림")
-                        .setMessage("메세지알림")
+                        .setMessage("사진을 가져올 곳을 선택해 주세요.")
                         .setPositiveButton("카메라", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -133,6 +154,7 @@ public class info_Activity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent();
                 setResult(100,intent);
+                intent.putExtra("login_id",login_id);
                 finish();
             }
         });
@@ -147,6 +169,12 @@ public class info_Activity extends AppCompatActivity {
 
             }else if(face_email != null){
                 onClick_face_Logout();
+            }
+            else{
+                auth.signOut();
+                Intent intent = new Intent(info_Activity.this,login_Activity.class);
+                startActivity(intent);
+                finish();
             }
 
             }
